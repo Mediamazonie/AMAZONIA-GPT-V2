@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test Chatbot</title>
+</head>
+<body>
+  <h1>Test Chatbot</h1>
+  <form id="chat-form">
+    <input type="text" id="message" placeholder="Tape ton message..." />
+    <button type="submit">Envoyer</button>
+  </form>
+  <pre id="response"></pre>
+
+  <script>
+    const form = document.getElementById('chat-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = document.getElementById('message').value;
+      const responseBox = document.getElementById('response');
+      const res = await fetch('http://localhost:3001/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: message }] }),
+      });
+      const data = await res.json();
+      responseBox.textContent = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>

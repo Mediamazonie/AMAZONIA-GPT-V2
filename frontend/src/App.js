@@ -9,22 +9,29 @@ function App() {
   const sendMessage = async () => {
     const userMessage = { role: "user", content: input };
     const updatedMessages = [...messages, userMessage];
+  
+    console.log("➡️ Envoi de la requête avec messages :", updatedMessages); // ← Nouveau log
+  
     setMessages(updatedMessages);
     setInput("");
-
-    const formData = new FormData();
-    if (image) {
-      formData.append("image", image);
-      formData.append("prompt", input);
-
-      const res = await axios.post("http://localhost:3001/api/vision", formData);
-      const assistantMessage = { role: "assistant", content: res.data.response };
-      setMessages([...updatedMessages, assistantMessage]);
-      setImage(null);
-    } else {
-      const res = await axios.post("http://localhost:3001/api/chat", { messages: updatedMessages });
-      const assistantMessage = res.data.choices[0].message;
-      setMessages([...updatedMessages, assistantMessage]);
+  
+    try {
+      const res = await axios.post("http://localhost:3001/api/chat", {
+        messages: updatedMessages
+      });
+  
+      console.log("✅ Réponse API reçue :", res.data); // ← Tu l'avais déjà, nickel
+  
+      const assistantMessage = res.data.choices?.[0]?.message;
+      console.log("🤖 Message assistant extrait :", assistantMessage); // ← Nouveau log
+  
+      if (assistantMessage) {
+        setMessages([...updatedMessages, assistantMessage]);
+      } else {
+        console.warn("⚠️ Aucun message assistant trouvé dans la réponse.");
+      }
+    } catch (error) {
+      console.error("❌ Erreur pendant l'appel API :", error); // ← Log des erreurs
     }
   };
 
